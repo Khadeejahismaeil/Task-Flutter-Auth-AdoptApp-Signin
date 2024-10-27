@@ -1,19 +1,20 @@
-import 'package:adopt_app/pages/add_page.dart';
-import 'package:adopt_app/pages/home_page.dart';
-import 'package:adopt_app/pages/signup_page.dart';
-import 'package:adopt_app/pages/update_page.dart';
-import 'package:adopt_app/providers/auth_provider.dart';
-import 'package:adopt_app/providers/pets_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import './providers/auth_provider.dart';
+import './providers/pets_provider.dart';
+import './pages/signin_page.dart';
+import './pages/home_page.dart';
+import './pages/add_page.dart';
+import './pages/signup_page.dart';
+import './pages/update_page.dart';
+import 'package:go_router/go_router.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<PetsProvider>(create: (_) => PetsProvider()),
-        ChangeNotifierProvider<AuthProvider>(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => PetsProvider()),
       ],
       child: MyApp(),
     ),
@@ -22,19 +23,20 @@ void main() {
 
 class MyApp extends StatelessWidget {
   MyApp({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routeInformationParser: _router.routeInformationParser,
-      routerDelegate: _router.routerDelegate,
-    );
-  }
 
-  final _router = GoRouter(
+  final GoRouter _router = GoRouter(
     routes: [
       GoRoute(
         path: '/',
         builder: (context, state) => const HomePage(),
+      ),
+      GoRoute(
+        path: '/signin',
+        builder: (context, state) => SigninPage(),
+      ),
+      GoRoute(
+        path: '/signup',
+        builder: (context, state) => SignupPage(),
       ),
       GoRoute(
         path: '/add',
@@ -43,15 +45,24 @@ class MyApp extends StatelessWidget {
       GoRoute(
         path: '/update/:petId',
         builder: (context, state) {
-          final pet = Provider.of<PetsProvider>(context).pets.firstWhere(
-              (pet) => pet.id.toString() == (state.params['petId']!));
+          final pet = Provider.of<PetsProvider>(context, listen: false)
+              .pets
+              .firstWhere((pet) => pet.id.toString() == state.params['petId']);
           return UpdatePage(pet: pet);
         },
       ),
-      GoRoute(
-        path: '/signup',
-        builder: (context, state) => SignupPage(),
-      ),
     ],
   );
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      routerDelegate: _router.routerDelegate,
+      routeInformationParser: _router.routeInformationParser,
+      title: 'Pets Adoption App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+    );
+  }
 }

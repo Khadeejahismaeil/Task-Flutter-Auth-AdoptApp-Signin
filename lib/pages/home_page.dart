@@ -3,6 +3,7 @@ import 'package:adopt_app/widgets/pet_card.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -14,22 +15,42 @@ class HomePage extends StatelessWidget {
         title: const Text("Pet Adopt"),
       ),
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            ListTile(
-              title: const Text("Signin"),
-              trailing: const Icon(Icons.login),
-              onTap: () {},
-            ),
-            ListTile(
-              title: const Text("Signup"),
-              trailing: const Icon(Icons.how_to_reg),
-              onTap: () {
-                GoRouter.of(context).push('/signup');
-              },
-            )
-          ],
+        child: Consumer<AuthProvider>(
+          builder: (context, auth, _) => ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(color: Colors.blue),
+                child: auth.isAuth
+                    ? Text('Welcome, ${auth.user?.username ?? ''}')
+                    : Text('Welcome! Please sign in.'),
+              ),
+              if (auth.isAuth)
+                ListTile(
+                  title: const Text('Sign Out'),
+                  trailing: const Icon(Icons.logout),
+                  onTap: () {
+                    auth.signout();
+                  },
+                )
+              else ...[
+                ListTile(
+                  title: const Text('Sign In'),
+                  trailing: const Icon(Icons.login),
+                  onTap: () {
+                    GoRouter.of(context).push('/signin');
+                  },
+                ),
+                ListTile(
+                  title: const Text('Sign Up'),
+                  trailing: const Icon(Icons.how_to_reg),
+                  onTap: () {
+                    GoRouter.of(context).push('/signup');
+                  },
+                ),
+              ],
+            ],
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -73,8 +94,7 @@ class HomePage extends StatelessWidget {
                                     MediaQuery.of(context).size.width /
                                         (MediaQuery.of(context).size.height),
                               ),
-                              physics:
-                                  const NeverScrollableScrollPhysics(), // <- Here
+                              physics: const NeverScrollableScrollPhysics(),
                               itemCount: petsProvider.pets.length,
                               itemBuilder: (context, index) =>
                                   PetCard(pet: petsProvider.pets[index])),
