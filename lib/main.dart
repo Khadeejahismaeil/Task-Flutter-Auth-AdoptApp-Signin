@@ -9,11 +9,14 @@ import './pages/signup_page.dart';
 import './pages/update_page.dart';
 import 'package:go_router/go_router.dart';
 
-void main() {
+void main() async {
+  AuthProvider authProvider = AuthProvider();
+  await authProvider.loadToken();
+
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => authProvider),
         ChangeNotifierProvider(create: (_) => PetsProvider()),
       ],
       child: MyApp(),

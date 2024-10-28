@@ -50,6 +50,17 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> loadToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? loadedToken = prefs.getString('token');
+    print(loadedToken);
+
+    if (loadedToken == null) return;
+    setToken(loadedToken);
+
+    notifyListeners();
+  }
+
   Future<void> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _token = prefs.getString('token');
