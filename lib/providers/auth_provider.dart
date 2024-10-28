@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/auth.dart';
-import 'package:jwt_decode/jwt_decode.dart';
-
 import '../models/user.dart';
 
 class AuthProvider with ChangeNotifier {
@@ -15,12 +13,21 @@ class AuthProvider with ChangeNotifier {
 
   bool get isAuth {
     if (_token == null) return false;
-    return !JwtDecoder.isExpired(_token!);
+    return !Jwt.isExpired(_token!);
   }
 
-  Future<void> signin(Map<String, String> user) async {
+  Future<void> signin(String username, String password) async {
     try {
-      String token = await AuthServices().signin(user);
+      String token = await AuthServices().signin(username, password);
+      setToken(token);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> signup(String username, String password) async {
+    try {
+      String token = await AuthServices().signup(username, password);
       setToken(token);
     } catch (e) {
       print(e);
@@ -46,14 +53,14 @@ class AuthProvider with ChangeNotifier {
   Future<void> getToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _token = prefs.getString('token');
-    if (_token != null && !JwtDecoder.isExpired(_token!)) {
+    if (_token != null && !Jwt.isExpired(_token!)) {
       _decodeToken(_token!);
     }
     notifyListeners();
   }
 
   void _decodeToken(String token) {
-    Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+    Map<String, dynamic> decodedToken = Jwt.parseJwt(token);
     _user = User.fromJson(decodedToken);
   }
 }

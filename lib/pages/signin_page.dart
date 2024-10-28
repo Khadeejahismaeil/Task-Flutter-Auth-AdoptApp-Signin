@@ -18,7 +18,7 @@ class SigninPage extends StatelessWidget {
           children: [
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email'),
+              decoration: InputDecoration(labelText: 'username'),
             ),
             TextField(
               controller: _passwordController,
@@ -28,11 +28,8 @@ class SigninPage extends StatelessWidget {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                final user = {
-                  'email': _emailController.text,
-                  'password': _passwordController.text,
-                };
-                Provider.of<AuthProvider>(context, listen: false).signin(user);
+                Provider.of<AuthProvider>(context, listen: false)
+                    .signin(_emailController.text, _passwordController.text);
               },
               child: Text('Sign In'),
             ),

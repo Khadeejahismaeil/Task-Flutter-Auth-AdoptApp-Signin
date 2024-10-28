@@ -30,10 +30,8 @@ class SignupPage extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                Provider.of<AuthProvider>(context, listen: false).signup(
-                    user: User(
-                        username: usernameController.text,
-                        password: passwordController.text));
+                Provider.of<AuthProvider>(context, listen: false)
+                    .signup(usernameController.text, passwordController.text);
               },
               child: const Text("Sign Up"),
             )
